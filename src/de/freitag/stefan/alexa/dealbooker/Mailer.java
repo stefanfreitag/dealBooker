@@ -7,21 +7,29 @@ import com.amazonaws.services.simpleemail.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Mailer {
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+
+class Mailer {
 
     private static final Logger log = LoggerFactory.getLogger(Mailer.class);
 
-    private static final String FROM = "stefan@stefreitag.de";
+    private static final String FROM = "stefan.freitag@rwe.com";
 
-    private static final String TO = "stefan@stefreitag.de";
+    private static final List<String> TO = Arrays.asList("stefan@stefreitag.de", "stefan.freitag@rwe.com");
 
-    // The subject line for the email.
+
     private static final String SUBJECT = "A deal has been booked";
 
 
-    static void sendMail(DealType dealType, int amount, Unit unit, Tenor tenor){
+    static void sendMail(DealType dealType, int amount, Unit unit, Tenor tenor) {
 
-        String rawTextBody = dealType.getText() + " " + amount + " " + unit + " " + tenor;
+        final String rawTextBody = Mailer.generateRawTextMessage(dealType, amount, unit, tenor);
+        log.info("Raw email text: " + rawTextBody);
+
+        final String htmlTextBody = Mailer.generateHtmlTextMessage(dealType, amount, unit, tenor);
+        log.info("HTML email text: " + htmlTextBody);
         try {
             AmazonSimpleEmailService client =
                     AmazonSimpleEmailServiceClientBuilder.standard()
@@ -32,17 +40,54 @@ public class Mailer {
                     .withMessage(new Message()
                             .withBody(new Body()
                                     .withText(new Content()
-                                            .withCharset("UTF-8").withData(rawTextBody)))
+                                            .withCharset("UTF-8").withData(rawTextBody))
+                                    .withHtml(new Content().withCharset("UTF-8").withData(htmlTextBody)))
                             .withSubject(new Content()
                                     .withCharset("UTF-8").withData(SUBJECT)))
                     .withSource(FROM);
             client.sendEmail(request);
-            log.info("Email was sent");
-        } catch (Exception ex) {
-            log.error("The email was not sent. Error message: "
-                    + ex.getMessage());
+            log.info("An e-mail was sent to " + TO);
+        } catch (final Exception exception) {
+            log.error("The email to " + TO + " was not sent. Error message: "
+                    + exception.getMessage());
         }
 
+    }
+
+    static String generateRawTextMessage(final DealType dealType, final int amount, final Unit unit, final Tenor tenor) {
+        Object[] params = new Object[]{dealType, amount, unit, tenor};
+
+        return MessageFormat.format("Hello trader,\r\n" +
+                "\r\n" +
+                "a deal has been made.\r\n" +
+                "\r\n" +
+                "Deal type:\t {0}\r\n" +
+                "Quantity: {1}\r\n" +
+                "Unit: {2}\r\n" +
+                "Tenor: {3}\r\n" +
+                "\r\n" +
+                "\r\n" +
+                "Best regards,\r\n" +
+                "The Deal Booker service", params);
+    }
+
+    static String generateHtmlTextMessage(final DealType dealType, final int amount, final Unit unit, final Tenor tenor) {
+        Object[] params = new Object[]{dealType, amount, unit, tenor};
+
+        return MessageFormat.format(
+                "<h3>Hello,</h3><br />" +
+                "<p>a deal has been made.</p><br />" +
+                "<table border=\"1\">" +
+                "<tr><th colspan=\"2\">Deal information</th></tr>"+
+                "<tr><td>Deal type</td><td>{0}</td></tr>" +
+                "<tr><td>Quantity</td><td>{1}</td></tr>" +
+                "<tr><td>Unit</td><td>{2}</td></tr>" +
+                "<tr><td>Tenor</td><td>{3}</td></tr>" +
+                "</table>" +
+                        "<br />" +
+                "<br />" +
+                "Best regards,<br />" +
+                "<i>The Deal Booker service</i>", params);
     }
 
 }

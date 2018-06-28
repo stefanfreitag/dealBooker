@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class DealBookerSpeechlet implements SpeechletV2 {
 
+    private static final String VERSION ="1.0.0";
 
     private static final Logger log = LoggerFactory.getLogger(DealBookerSpeechlet.class);
 
@@ -27,7 +28,7 @@ public class DealBookerSpeechlet implements SpeechletV2 {
     private static final String HELP_TEXT = "I can book trades for you.";
 
     private static final String WELCOME_REPROMPT_TEXT = " What kind of deal would you like to book?";
-    private static final String WELCOME_TEXT = "Welcome to Deal Booker." + WELCOME_REPROMPT_TEXT;
+    private static final String WELCOME_TEXT = "Welcome to Deal Booker " + VERSION + "." + WELCOME_REPROMPT_TEXT;
 
     @Override
     public void onSessionStarted(final SpeechletRequestEnvelope<SessionStartedRequest> requestEnvelope) {

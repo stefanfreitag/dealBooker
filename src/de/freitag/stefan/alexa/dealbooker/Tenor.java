@@ -2,7 +2,8 @@ package de.freitag.stefan.alexa.dealbooker;
 
 enum Tenor {
     DAYAHEAD("day ahead"),
-    WITHINDAY("within day");
+    WITHINDAY("within day"),
+    WEEKEND("weekend");
     private String text;
 
     Tenor(final String text) {

@@ -1,7 +1,7 @@
 package de.freitag.stefan.alexa.dealbooker;
 
 enum DealType {
-    BUY("buy"), SELL("sell");
+    BUY("Buy"), SELL("Sell");
 
     private String text;
 
@@ -13,7 +13,7 @@ enum DealType {
         return this.text;
     }
 
-    static DealType fromString(String text) {
+    static DealType fromString(final String text) {
         for (DealType dealType : DealType.values()) {
             if (dealType.text.equalsIgnoreCase(text)) {
                 return dealType;

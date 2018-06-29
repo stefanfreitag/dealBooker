@@ -3,6 +3,9 @@ package de.freitag.stefan.alexa.dealbooker;
 import com.amazon.speech.json.SpeechletRequestEnvelope;
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.slu.Slot;
+import com.amazon.speech.slu.entityresolution.Resolution;
+import com.amazon.speech.slu.entityresolution.Resolutions;
+import com.amazon.speech.slu.entityresolution.StatusCode;
 import com.amazon.speech.speechlet.*;
 import com.amazon.speech.ui.*;
 import org.slf4j.Logger;
@@ -11,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class DealBookerSpeechlet implements SpeechletV2 {
 
-    private static final String VERSION ="1.0.0";
+    private static final String VERSION ="1.0.1";
 
     private static final Logger log = LoggerFactory.getLogger(DealBookerSpeechlet.class);
 
@@ -93,7 +96,7 @@ public class DealBookerSpeechlet implements SpeechletV2 {
 
         //Get unit
         Slot unitSlot = intent.getSlot(SLOT_UNIT);
-        Unit unit = Unit.fromString(unitSlot.getValue());
+        Unit unit = getUnit(unitSlot);
         log.info("Unit: " + unit);
 
         //Get tenor
@@ -109,6 +112,22 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         PlainTextOutputSpeech speech = getPlainTextOutputSpeech(speechText);
         return SpeechletResponse.newTellResponse(speech, card);
         //return getHelpResponse();
+    }
+
+    private Unit getUnit(final Slot unitSlot) {
+        String value = unitSlot.getValue();
+        Resolution resolution = (unitSlot.getResolutions()!=null
+                && !unitSlot.getResolutions().getResolutionsPerAuthority().isEmpty()
+                ) ? unitSlot.getResolutions().getResolutionsPerAuthority().get(0) : null;
+
+        if (resolution!=null
+                && resolution.getStatus().getCode().equals(StatusCode.ER_SUCCESS_MATCH)
+                && resolution.getValueWrappers()!=null)
+        {
+            value = resolution.getValueWrapperAtIndex(0).getValue().getName();
+        }
+
+        return Unit.fromString(value);
     }
 
     /**

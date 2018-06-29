@@ -1,8 +1,11 @@
 package de.freitag.stefan.alexa.dealbooker;
 
 enum Unit {
+    GIGAWATT("gigawatt"),
     MEGAWATT("megawatt"),
-    KILOWATT("kilowatt");
+    KILOWATT("kilowatt"),
+    WATT("watt");
+
     private String text;
 
     Unit(final String text) {
@@ -13,7 +16,7 @@ enum Unit {
         return this.text;
     }
 
-    static Unit fromString(String text) {
+    static Unit fromString(final String text) {
         for (Unit unit : Unit.values()) {
             if (unit.text.equalsIgnoreCase(text)) {
                 return unit;

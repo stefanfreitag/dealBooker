@@ -1,0 +1,132 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "deal booker",
+      "intents": [
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "enterDeal",
+          "slots": [
+            {
+              "name": "dealType",
+              "type": "DealType"
+            },
+            {
+              "name": "amount",
+              "type": "AMAZON.NUMBER"
+            },
+            {
+              "name": "unit",
+              "type": "unit"
+            },
+            {
+              "name": "tenor",
+              "type": "tenor"
+            }
+          ],
+          "samples": [
+            "{dealType} {amount} {unit} {tenor}"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "DealType",
+          "values": [
+            {
+              "id": "DealType.SELL",
+              "name": {
+                "value": "sell"
+              }
+            },
+            {
+              "id": "DealType.BUY",
+              "name": {
+                "value": "buy"
+              }
+            }
+          ]
+        },
+        {
+          "name": "unit",
+          "values": [
+            {
+              "id": "gigawatt",
+              "name": {
+                "value": "gigawatt",
+                "synonyms": [
+                  "g. w.",
+                  "gigas"
+                ]
+              }
+            },
+            {
+              "id": "watt",
+              "name": {
+                "value": "watt",
+                "synonyms": [
+                  "watts"
+                ]
+              }
+            },
+            {
+              "id": "kilowatt",
+              "name": {
+                "value": "kilowatt",
+                "synonyms": [
+                  "k. w.",
+                  "kilos"
+                ]
+              }
+            },
+            {
+              "id": "megawatt",
+              "name": {
+                "value": "megawatt",
+                "synonyms": [
+                  "m. w.",
+                  "megas"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "tenor",
+          "values": [
+            {
+              "name": {
+                "value": "weekend"
+              }
+            },
+            {
+              "name": {
+                "value": "within day"
+              }
+            },
+            {
+              "name": {
+                "value": "day ahead"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

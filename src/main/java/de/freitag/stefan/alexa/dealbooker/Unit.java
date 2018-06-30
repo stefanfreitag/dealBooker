@@ -1,10 +1,10 @@
 package de.freitag.stefan.alexa.dealbooker;
 
 enum Unit {
-    GIGAWATT("gigawatt"),
-    MEGAWATT("megawatt"),
-    KILOWATT("kilowatt"),
-    WATT("watt");
+    GIGAWATT("Gigawatt"),
+    MEGAWATT("Megawatt"),
+    KILOWATT("Kilowatt"),
+    WATT("Watt");
 
     private String text;
 

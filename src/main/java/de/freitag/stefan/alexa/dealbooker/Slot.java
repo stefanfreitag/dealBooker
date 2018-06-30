@@ -2,7 +2,9 @@ package de.freitag.stefan.alexa.dealbooker;
 
 enum Slot {
     DEAL_TYPE("dealType"),
-    AMOUNT("amount"),
+    QUANTITY("quantity"),
+    PRICE("price"),
+    PRODUCT("product"),
     UNIT("unit");
 
     private String text;

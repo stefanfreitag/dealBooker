@@ -23,12 +23,12 @@ class Mailer {
     private static final String SUBJECT = "A deal has been booked";
 
 
-    static void sendMail(DealType dealType, int amount, Unit unit, Tenor tenor) {
+    static void sendMail(DealType dealType, int amount, Unit unit, Product product, int price) {
 
-        final String rawTextBody = Mailer.generateRawTextMessage(dealType, amount, unit, tenor);
+        final String rawTextBody = Mailer.generateRawTextMessage(dealType, amount, unit, product, price);
         log.info("Raw email text: " + rawTextBody);
 
-        final String htmlTextBody = Mailer.generateHtmlTextMessage(dealType, amount, unit, tenor);
+        final String htmlTextBody = Mailer.generateHtmlTextMessage(dealType, amount, unit, product, price);
         log.info("HTML email text: " + htmlTextBody);
         try {
             AmazonSimpleEmailService client =
@@ -54,8 +54,8 @@ class Mailer {
 
     }
 
-    static String generateRawTextMessage(final DealType dealType, final int amount, final Unit unit, final Tenor tenor) {
-        Object[] params = new Object[]{dealType, amount, unit, tenor};
+    static String generateRawTextMessage(final DealType dealType, final int amount, final Unit unit, final Product product, final int price) {
+        Object[] params = new Object[]{dealType, amount, unit, product, price};
 
         return MessageFormat.format("Hello trader,\r\n" +
                 "\r\n" +
@@ -64,15 +64,16 @@ class Mailer {
                 "Deal type:\t {0}\r\n" +
                 "Quantity: {1}\r\n" +
                 "Unit: {2}\r\n" +
-                "Tenor: {3}\r\n" +
+                "Product: {3}\r\n" +
+                "Price: {4}\r\n" +
                 "\r\n" +
                 "\r\n" +
                 "Best regards,\r\n" +
                 "The Deal Booker service", params);
     }
 
-    static String generateHtmlTextMessage(final DealType dealType, final int amount, final Unit unit, final Tenor tenor) {
-        Object[] params = new Object[]{dealType, amount, unit, tenor};
+    static String generateHtmlTextMessage(final DealType dealType, final int amount, final Unit unit, final Product product, final int price) {
+        Object[] params = new Object[]{dealType.getText(), amount, unit.getText(), product, price};
 
         return MessageFormat.format(
                 "<h3>Hello,</h3><br />" +
@@ -82,7 +83,8 @@ class Mailer {
                 "<tr><td>Deal type</td><td>{0}</td></tr>" +
                 "<tr><td>Quantity</td><td>{1}</td></tr>" +
                 "<tr><td>Unit</td><td>{2}</td></tr>" +
-                "<tr><td>Tenor</td><td>{3}</td></tr>" +
+                "<tr><td>Product</td><td>{3}</td></tr>" +
+                        "<tr><td>Price</td><td>{4}</td></tr>" +
                 "</table>" +
                         "<br />" +
                 "<br />" +

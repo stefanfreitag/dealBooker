@@ -13,12 +13,12 @@ enum DealType {
         return this.text;
     }
 
-    static DealType fromString(final String text) {
+    static DealType fromString(final String text) throws DealBookerException {
         for (DealType dealType : DealType.values()) {
             if (dealType.text.equalsIgnoreCase(text)) {
                 return dealType;
             }
         }
-        throw new IllegalArgumentException("No deal type with text " + text + " found");
+        throw new DealBookerException("No deal type with text " + text + " found");
     }
 }

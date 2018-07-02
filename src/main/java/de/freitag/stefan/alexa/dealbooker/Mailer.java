@@ -8,20 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
 
 class Mailer {
 
+
     private static final Logger log = LoggerFactory.getLogger(Mailer.class);
 
-    private static final String FROM = "stefan.freitag@rwe.com";
-
-    private static final List<String> TO = Arrays.asList("stefan@stefreitag.de", "stefan.freitag@rwe.com");
-
-
-    private static final String SUBJECT = "A deal has been booked";
-
+    private static final MailerConfiguration mailerConfig = new MailerConfiguration();
 
     static void sendMail(DealType dealType, int amount, Unit unit, Product product, int price) {
 
@@ -36,19 +29,19 @@ class Mailer {
                             .withRegion(Regions.EU_WEST_1).build();
             SendEmailRequest request = new SendEmailRequest()
                     .withDestination(
-                            new Destination().withToAddresses(TO))
+                            new Destination().withToAddresses(mailerConfig.getTo()))
                     .withMessage(new Message()
                             .withBody(new Body()
                                     .withText(new Content()
                                             .withCharset("UTF-8").withData(rawTextBody))
                                     .withHtml(new Content().withCharset("UTF-8").withData(htmlTextBody)))
                             .withSubject(new Content()
-                                    .withCharset("UTF-8").withData(SUBJECT)))
-                    .withSource(FROM);
+                                    .withCharset("UTF-8").withData(mailerConfig.getSubject())))
+                    .withSource(mailerConfig.getFrom());
             client.sendEmail(request);
-            log.info("An e-mail was sent to " + TO);
+            log.info("An e-mail was sent to " + mailerConfig.getTo());
         } catch (final Exception exception) {
-            log.error("The email to " + TO + " was not sent. Error message: "
+            log.error("The email to " + mailerConfig.getTo() + " was not sent. Error message: "
                     + exception.getMessage());
         }
 

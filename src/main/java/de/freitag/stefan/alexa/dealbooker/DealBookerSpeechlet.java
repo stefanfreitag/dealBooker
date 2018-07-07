@@ -10,6 +10,7 @@ import com.amazon.speech.ui.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -82,14 +83,12 @@ public class DealBookerSpeechlet implements SpeechletV2 {
     private SpeechletResponse bookDeal(final Intent intent) {
 
         Slot dealTypeSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.DEAL_TYPE.name());
-        DealType dealType;
-        try {
-            dealType = getDealType(dealTypeSlot);
-            log.info("Found deal type  " + dealType + ".");
-        } catch (final DealBookerException exception) {
-            log.error(exception.getMessage(), exception);
-            return createErrorResponse(exception.getMessage());
+        Optional<DealType> dealType = getDealType(dealTypeSlot);
+        if (!dealType.isPresent()) {
+            log.error("Deal type is absent.");
+            return createErrorResponse("I had problems in understanding if you would like to buy or sell");
         }
+        log.info("Found deal type  " + dealType + ".");
 
         int quantity;
         try {
@@ -101,8 +100,7 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         }
 
         Slot unitSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.UNIT.name());
-        Optional<Unit> unit;
-        unit = getUnit(unitSlot);
+        Optional<Unit> unit = getUnit(unitSlot);
         if (!unit.isPresent()) {
             log.error("Unit value is absent.");
             return createErrorResponse("I had problems understanding the unit.");
@@ -119,23 +117,24 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         }
 
         Slot productSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.PRODUCT.name());
-        Optional<Product> product;
-        product = getProduct(productSlot);
+        Optional<Product> product = getProduct(productSlot);
         if (!product.isPresent()) {
             log.error("Product information is missing");
             return createErrorResponse("I had problems figuring out the product.");
         }
         log.info("Found product: " + product);
 
-        //TODO: Lokalisieren
-        String speechText = dealType.name() + " " + quantity + " " + unit.get().name() + " " + product.get().name();
 
-        Mailer.sendMail(dealType, quantity, unit.get(), product.get(), price);
+        String speechText;
+        if (DealType.BUY.equals(dealType.get())) {
+            speechText = MessageFormat.format(bundle.getString("BUY_INFORMATION"), new Object[]{quantity, unit.get().name(), product.get().name(), price});
+        } else {
+            speechText = MessageFormat.format(bundle.getString("SELL_INFORMATION"), new Object[]{quantity, unit.get().name(), product.get().name(), price});
+        }
+        Mailer.sendMail(dealType.get(), quantity, unit.get(), product.get(), price);
 
         SimpleCard card = getSimpleCard(CARD_TITLE, speechText);
-
         PlainTextOutputSpeech speech = getPlainTextOutputSpeech(speechText);
-
         return SpeechletResponse.newTellResponse(speech, card);
     }
 
@@ -164,9 +163,9 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         }
     }
 
-    private DealType getDealType(final Slot dealTypeSlot) throws DealBookerException {
+    private Optional<DealType> getDealType(final Slot dealTypeSlot) {
         String value = getIdFromResolution(dealTypeSlot);
-        return DealType.from(value);
+        return DealType.from(value.toUpperCase());
     }
 
     private Optional<Unit> getUnit(final Slot unitSlot) {
@@ -205,8 +204,7 @@ public class DealBookerSpeechlet implements SpeechletV2 {
     /**
      * Helper method that creates a card object.
      *
-     * @param title   title of the card
-     * @param content body of the card
+     * @param title title of the card* @param content body of the card
      * @return SimpleCard the display card to be sent along with the voice response.
      */
     private SimpleCard getSimpleCard(final String title, final String content) {

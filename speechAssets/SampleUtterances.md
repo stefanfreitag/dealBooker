@@ -19,6 +19,7 @@ Starte deal booker (de_DE)
 ```
 i would like to buy 50 watt day ahead for 55 (en_US)
 buy 580 kilowatt rom for 11 (en_US)
+buy twenty two thousand megawatt within day for five (en_US)
 kaufe zehn kilowatt bom für zwei und zwanzig (de_DE)
 ```
 
@@ -26,6 +27,7 @@ kaufe zehn kilowatt bom für zwei und zwanzig (de_DE)
 ```
 sell 2 gigawattt bom for 100 (en_US)
 please sell 3 megas  bom for 7 (en_US)
+sell twenty two thousand megawatt within day for five (en_US)
 please sell 11233 megawatt within day for 99  (en_US)
 verkaufe zehn kilowatt bom für zwanzig (de_DE)
 verkaufe drei giga weekend für siebzehn (de_DE)

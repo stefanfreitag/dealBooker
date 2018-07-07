@@ -1,15 +1,15 @@
 package de.freitag.stefan.alexa.dealbooker;
 
+import com.google.common.base.Enums;
+
+import java.util.Objects;
+import java.util.Optional;
+
 enum DealType {
     BUY, SELL;
 
-
-    static DealType from(final String text) throws DealBookerException {
-        for (DealType dealType : DealType.values()) {
-            if (dealType.name().equalsIgnoreCase(text)) {
-                return dealType;
-            }
-        }
-        throw new DealBookerException("No deal type with text " + text + " found.");
+    static Optional<DealType> from(final String text) {
+        Objects.requireNonNull(text);
+        return Enums.getIfPresent(DealType.class, text).toJavaUtil();
     }
 }

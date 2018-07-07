@@ -66,7 +66,7 @@ class Mailer {
     }
 
     static String generateHtmlTextMessage(final DealType dealType, final int amount, final Unit unit, final Product product, final int price) {
-        Object[] params = new Object[]{dealType.getText(), amount, unit.getText(), product, price};
+        Object[] params = new Object[]{dealType.name(), amount, unit.name(), product, price};
 
         return MessageFormat.format(
                 "<h3>Hello,</h3><br />" +

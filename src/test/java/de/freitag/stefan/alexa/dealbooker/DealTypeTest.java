@@ -8,17 +8,17 @@ class DealTypeTest {
 
     @Test
     void fromStringForBuyReturnsExpectedValue() throws DealBookerException {
-        assertEquals(DealType.BUY,DealType.fromString("buy"));
+        assertEquals(DealType.BUY,DealType.from("buy"));
     }
 
     @Test
     void fromStringForSelReturnsExpectedValue()throws DealBookerException {
-        assertEquals(DealType.SELL,DealType.fromString("sell"));
+        assertEquals(DealType.SELL,DealType.from("sell"));
     }
 
     @Test
     void fromStringForUnknownValueThrowsExceptions() {
-        assertThrows(DealBookerException.class, () -> DealType.fromString("unknownDealType"));
+        assertThrows(DealBookerException.class, () -> DealType.from("unknownDealType"));
     }
 
 }

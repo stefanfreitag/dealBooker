@@ -1,29 +1,19 @@
 package de.freitag.stefan.alexa.dealbooker;
 
 enum Slot {
-    DEAL_TYPE("dealType"),
-    QUANTITY("quantity"),
-    PRICE("price"),
-    PRODUCT("product"),
-    UNIT("unit");
+    DEAL_TYPE,
+    QUANTITY,
+    PRICE,
+    PRODUCT,
+    UNIT;
 
-    private String text;
-
-    Slot(final String text) {
-        this.text = text;
-    }
-
-    String getText() {
-        return this.text;
-    }
-
-    static Slot fromString(String text) {
+    static Slot from(final String text) {
         for (Slot slot : Slot.values()) {
-            if (slot.text.equalsIgnoreCase(text)) {
+            if (slot.name().equalsIgnoreCase(text)) {
                 return slot;
             }
         }
-        throw new IllegalArgumentException("No slot with text " + text + " found");
+        throw new IllegalArgumentException("No slot with text " + text + " found.");
     }
 
 }

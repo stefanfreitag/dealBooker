@@ -10,19 +10,21 @@ import com.amazon.speech.ui.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 
 public class DealBookerSpeechlet implements SpeechletV2 {
 
     private static final Logger log = LoggerFactory.getLogger(DealBookerSpeechlet.class);
 
+    private ResourceBundle bundle;
+
     /**
      * Title used when displaying cards on Alexa devices.
      */
     private static final String CARD_TITLE = "Deal Booker";
-    private static final String HELP_TEXT = "I can book trades for you.";
 
-    private static final String WELCOME_REPROMPT_TEXT = " What kind of deal would you like to book?";
-    private static final String WELCOME_TEXT = "Welcome to the Deal Booker." + WELCOME_REPROMPT_TEXT;
 
     @Override
     public void onSessionStarted(final SpeechletRequestEnvelope<SessionStartedRequest> requestEnvelope) {
@@ -38,6 +40,9 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         Session session = requestEnvelope.getSession();
         log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId());
+        Locale locale = request.getLocale();
+        log.info("Found locale: " + locale);
+        bundle = ResourceBundle.getBundle("DealBookerSpeechlet", locale);
         return getWelcomeResponse();
     }
 
@@ -46,7 +51,6 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         IntentRequest request = requestEnvelope.getRequest();
         log.info("onIntent requestId={}, sessionId={}", request.getRequestId(),
                 requestEnvelope.getSession().getSessionId());
-
         Intent intent = request.getIntent();
         String intentName = (intent != null) ? intent.getName() : null;
 
@@ -56,13 +60,12 @@ public class DealBookerSpeechlet implements SpeechletV2 {
             return getHelpResponse();
         } else if ("AMAZON.CancelIntent".equals(intentName) || "AMAZON.StopIntent".equals(intentName)) {
             PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-            outputSpeech.setText("Goodbye");
+            outputSpeech.setText(bundle.getString("GOODBYE"));
             return SpeechletResponse.newTellResponse(outputSpeech);
         } else {
-            return getAskResponse(CARD_TITLE, "I do not understand. Please try again.");
+            return getAskResponse(CARD_TITLE, bundle.getString("DO_NOT_UNDERSTAND"));
         }
     }
-
 
     @Override
     public void onSessionEnded(SpeechletRequestEnvelope<SessionEndedRequest> requestEnvelope) {
@@ -71,16 +74,19 @@ public class DealBookerSpeechlet implements SpeechletV2 {
     }
 
     private SpeechletResponse getWelcomeResponse() {
-        return newAskResponse(WELCOME_TEXT, false, WELCOME_REPROMPT_TEXT, false);
+        String welcome = bundle.getString("WELCOME") + " " + bundle.getString("WELCOME_REPROMPT");
+        String welcomeReprompt = bundle.getString("WELCOME_REPROMPT");
+        return newAskResponse(welcome, false, welcomeReprompt, false);
     }
 
     private SpeechletResponse bookDeal(final Intent intent) {
 
+        Slot dealTypeSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.DEAL_TYPE.name());
         DealType dealType;
         try {
-            dealType = getDealType(intent);
-            log.info("Found deal type  " + dealType);
-        } catch (DealBookerException exception) {
+            dealType = getDealType(dealTypeSlot);
+            log.info("Found deal type  " + dealType + ".");
+        } catch (final DealBookerException exception) {
             log.error(exception.getMessage());
             return createErrorResponse(exception.getMessage());
         }
@@ -88,81 +94,96 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         int quantity;
         try {
             quantity = getQuantity(intent);
-            log.info("Found quantity  " + quantity);
-        } catch (DealBookerException exception) {
+            log.info("Found quantity  " + quantity + ".");
+        } catch (final DealBookerException exception) {
+            log.error(exception.getMessage());
             return createErrorResponse(exception.getMessage());
         }
 
-        Slot unitSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.UNIT.getText());
-        Unit unit = getUnit(unitSlot);
-        log.info("Unit: " + unit);
+        Slot unitSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.UNIT.name());
+        Unit unit;
+        try {
+            unit = getUnit(unitSlot);
+            log.info("Found unit " + unit);
+        } catch (final DealBookerException exception) {
+            log.error(exception.getMessage());
+            return createErrorResponse(exception.getMessage());
+        }
 
         int price;
         try {
             price = getPrice(intent);
             log.info("Found price  " + quantity);
         } catch (DealBookerException exception) {
+            log.error(exception.getMessage());
             return createErrorResponse(exception.getMessage());
         }
 
-
+        Slot productSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.PRODUCT.name());
         Product product;
         try {
-            Slot productSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.PRODUCT.getText());
-            product = Product.fromString(productSlot.getValue());
+            product = Product.from(productSlot.getValue());
             log.info("Found product: " + product);
-        } catch(DealBookerException exception) {
+        } catch (DealBookerException exception) {
+            log.error(exception.getMessage());
             return createErrorResponse(exception.getMessage());
         }
 
+        //TODO: Lokalisieren
+        String speechText = dealType.name() + " " + quantity + " " + unit.name() + " " + product.getText();
 
-        String speechText = dealType.getText() + " " + quantity + " " + unit.getText() + " " + product.getText();
         Mailer.sendMail(dealType, quantity, unit, product, price);
+
         SimpleCard card = getSimpleCard(CARD_TITLE, speechText);
+
         PlainTextOutputSpeech speech = getPlainTextOutputSpeech(speechText);
 
         return SpeechletResponse.newTellResponse(speech, card);
     }
 
     //TODO: Refactoring with getQuantity
-    private int getPrice(final Intent intent) throws DealBookerException{
-        Slot priceSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.PRICE.getText());
+    private int getPrice(final Intent intent) throws DealBookerException {
+        Slot priceSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.PRICE.name());
         String value = priceSlot.getValue();
-        if (value!=null) {
+        if (value != null) {
             return Integer.valueOf(priceSlot.getValue());
         } else {
             throw new DealBookerException("Information on price is missing.");
         }
     }
 
-    private int getQuantity(final Intent intent) throws DealBookerException{
-        Slot quantitySlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.QUANTITY.getText());
+    private int getQuantity(final Intent intent) throws DealBookerException {
+        Slot quantitySlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.QUANTITY.name());
         String value = quantitySlot.getValue();
-        if (value!=null) {
+        if (value != null) {
             return Integer.valueOf(quantitySlot.getValue());
         } else {
             throw new DealBookerException("Information on quantity is missing.");
         }
     }
 
-    private DealType getDealType(final Intent intent) throws DealBookerException {
-        Slot dealTypeSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.DEAL_TYPE.getText());
-        return DealType.fromString(dealTypeSlot.getValue());
+    private DealType getDealType(final Slot dealTypeSlot) throws DealBookerException {
+        String value = getIdFromResolution(dealTypeSlot);
+        return DealType.from(value);
     }
 
-    private Unit getUnit(final Slot unitSlot) {
-        String value = unitSlot.getValue();
-        Resolution resolution = (unitSlot.getResolutions() != null
-                && !unitSlot.getResolutions().getResolutionsPerAuthority().isEmpty()
-        ) ? unitSlot.getResolutions().getResolutionsPerAuthority().get(0) : null;
+    private Unit getUnit(final Slot unitSlot) throws DealBookerException {
+        String value = getIdFromResolution(unitSlot);
+        return Unit.from(value);
+    }
+
+    private String getIdFromResolution(final Slot slot) {
+        String value = slot.getValue();
+        Resolution resolution = (slot.getResolutions() != null
+                && !slot.getResolutions().getResolutionsPerAuthority().isEmpty()
+        ) ? slot.getResolutions().getResolutionsPerAuthority().get(0) : null;
 
         if (resolution != null
                 && resolution.getStatus().getCode().equals(StatusCode.ER_SUCCESS_MATCH)
                 && resolution.getValueWrappers() != null) {
-            value = resolution.getValueWrapperAtIndex(0).getValue().getName();
+            value = resolution.getValueWrapperAtIndex(0).getValue().getId();
         }
-
-        return Unit.fromString(value);
+        return value;
     }
 
     /**
@@ -171,7 +192,7 @@ public class DealBookerSpeechlet implements SpeechletV2 {
      * @return SpeechletResponse spoken and visual response for the given intent
      */
     private SpeechletResponse getHelpResponse() {
-        return getAskResponse(CARD_TITLE, HELP_TEXT);
+        return getAskResponse(CARD_TITLE, bundle.getString("HELP"));
     }
 
     /**
@@ -270,4 +291,6 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         PlainTextOutputSpeech speech = getPlainTextOutputSpeech(errorMessage);
         return SpeechletResponse.newTellResponse(speech, card);
     }
+
+
 }

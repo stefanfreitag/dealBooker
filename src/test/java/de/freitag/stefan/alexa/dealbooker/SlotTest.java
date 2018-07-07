@@ -8,6 +8,6 @@ final class SlotTest {
 
     @Test
     void fromStringForUnknownValueThrowsExceptions() {
-        assertThrows(IllegalArgumentException.class, () -> Slot.fromString("unknownSlot"));
+        assertThrows(IllegalArgumentException.class, () -> Slot.from("unknownSlot"));
     }
 }

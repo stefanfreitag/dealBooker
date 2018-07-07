@@ -1,0 +1,161 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "deal booker",
+            "intents": [
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": [
+                        "Cancel"
+                    ]
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": [
+                        "Help"
+                    ]
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": [
+                        "Stop"
+                    ]
+                },
+                {
+                    "name": "enterDeal",
+                    "slots": [
+                        {
+                            "name": "DEAL_TYPE",
+                            "type": "DealType"
+                        },
+                        {
+                            "name": "QUANTITY",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "UNIT",
+                            "type": "unit"
+                        },
+                        {
+                            "name": "PRODUCT",
+                            "type": "product"
+                        },
+                        {
+                            "name": "PRICE",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "please {DEAL_TYPE} {QUANTITY} {UNIT} {PRODUCT} for {PRICE}",
+                        "{DEAL_TYPE} {QUANTITY} {UNIT} {PRODUCT} for a price of {PRICE}",
+                        "for {PRICE} {DEAL_TYPE} {QUANTITY} {UNIT} {PRODUCT}",
+                        "I would like to {DEAL_TYPE} {QUANTITY} {UNIT} {PRODUCT} for {PRICE}",
+                        "{DEAL_TYPE} {QUANTITY} {UNIT} {PRODUCT} for {PRICE}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "DealType",
+                    "values": [
+                        {
+                            "id": "SELL",
+                            "name": {
+                                "value": "sell"
+                            }
+                        },
+                        {
+                            "id": "BUY",
+                            "name": {
+                                "value": "buy"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "unit",
+                    "values": [
+                        {
+                            "id": "gigawatt",
+                            "name": {
+                                "value": "gigawatt",
+                                "synonyms": [
+                                    "g. w.",
+                                    "gigas"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "watt",
+                            "name": {
+                                "value": "watt",
+                                "synonyms": [
+                                    "watts"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "kilowatt",
+                            "name": {
+                                "value": "kilowatt",
+                                "synonyms": [
+                                    "k. w.",
+                                    "kilos"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "megawatt",
+                            "name": {
+                                "value": "megawatt",
+                                "synonyms": [
+                                    "m. w.",
+                                    "megas"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "product",
+                    "values": [
+                        {
+                            "id": "REST_OF_MONTH",
+                            "name": {
+                                "value": "rom"
+                            }
+                        },
+                        {
+                            "id": "BALANCE_OF_MONTH",
+                            "name": {
+                                "value": "bom"
+                            }
+                        },
+                        {
+                            "id": "WEEKEND",
+                            "name": {
+                                "value": "weekend"
+                            }
+                        },
+                        {
+                            "id": "WITHIN_DAY",
+                            "name": {
+                                "value": "within day"
+                            }
+                        },
+                        {
+                            "id": "DAY_AHEAD",
+                            "name": {
+                                "value": "day ahead"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

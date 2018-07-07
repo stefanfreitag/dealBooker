@@ -10,20 +10,22 @@ When trading you need to specify this information
 # Sample utterances
 Starting the skill
 ```
-Start deal booker
+Start deal booker (en_US)
+Starte deal booker (de_DE)
 ``` 
 
 ## Buying
 
 ```
-i would like to buy 50 watt day ahead for 55
+i would like to buy 50 watt day ahead for 55 (en_US)
+kaufe zehn kilowatt bom für zwei und zwanzig (de_DE)
 ```
 
 ## Selling
 ```
-sell 2 gigawattt bom for 100
-```
+sell 2 gigawattt bom for 100 (en_US)
+please sell 11233 megawatt within day for 99  (en_US)
+verkaufe zehn kilowatt bom für zwanzig (de_DE)
+verkaufe drei giga weekend für siebzehn (de_DE)
 
-```
-please sell 11233 megawatt within day for 99
 ```

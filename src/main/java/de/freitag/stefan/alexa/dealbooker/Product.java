@@ -16,7 +16,7 @@ enum Product {
         return this.text;
     }
 
-    static Product fromString(final String text) throws  DealBookerException{
+    static Product from(final String text) throws  DealBookerException{
         for (Product product : Product.values()) {
             if (product.text.equalsIgnoreCase(text)) {
                 return product;

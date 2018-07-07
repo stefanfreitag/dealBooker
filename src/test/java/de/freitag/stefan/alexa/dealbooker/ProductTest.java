@@ -8,6 +8,6 @@ class ProductTest {
 
     @Test
     void fromStringForUnknownValueThrowsExceptions() {
-        assertThrows(DealBookerException.class, () -> Product.fromString("unknownProduct"));
+        assertThrows(DealBookerException.class, () -> Product.from("unknownProduct"));
     }
 }

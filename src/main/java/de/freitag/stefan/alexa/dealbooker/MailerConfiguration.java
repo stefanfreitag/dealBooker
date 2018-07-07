@@ -24,7 +24,7 @@ class MailerConfiguration {
     private static Map<String, String> properties;
 
     static {
-        File configFile = new File("src/main/resources/mailer.cfg");
+        File configFile = new File("mailer.cfg");
         try {
             FileReader reader = new FileReader(configFile);
             Properties props = new Properties();
@@ -53,6 +53,7 @@ class MailerConfiguration {
     String getSubject() {
         return this.properties.get(KEY.SUBJECT.name());
     }
+
 
 }
 

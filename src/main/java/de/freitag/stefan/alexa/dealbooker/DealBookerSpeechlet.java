@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 
@@ -24,7 +25,6 @@ public class DealBookerSpeechlet implements SpeechletV2 {
      * Title used when displaying cards on Alexa devices.
      */
     private static final String CARD_TITLE = "Deal Booker";
-
 
     @Override
     public void onSessionStarted(final SpeechletRequestEnvelope<SessionStartedRequest> requestEnvelope) {
@@ -41,7 +41,7 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId());
         Locale locale = request.getLocale();
-        log.info("Found locale: " + locale);
+        log.info("Found locale: " + locale + ".");
         bundle = ResourceBundle.getBundle("DealBookerSpeechlet", locale);
         return getWelcomeResponse();
     }
@@ -87,7 +87,7 @@ public class DealBookerSpeechlet implements SpeechletV2 {
             dealType = getDealType(dealTypeSlot);
             log.info("Found deal type  " + dealType + ".");
         } catch (final DealBookerException exception) {
-            log.error(exception.getMessage());
+            log.error(exception.getMessage(), exception);
             return createErrorResponse(exception.getMessage());
         }
 
@@ -96,19 +96,18 @@ public class DealBookerSpeechlet implements SpeechletV2 {
             quantity = getQuantity(intent);
             log.info("Found quantity  " + quantity + ".");
         } catch (final DealBookerException exception) {
-            log.error(exception.getMessage());
+            log.error(exception.getMessage(), exception);
             return createErrorResponse(exception.getMessage());
         }
 
         Slot unitSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.UNIT.name());
-        Unit unit;
-        try {
-            unit = getUnit(unitSlot);
-            log.info("Found unit " + unit);
-        } catch (final DealBookerException exception) {
-            log.error(exception.getMessage());
-            return createErrorResponse(exception.getMessage());
+        Optional<Unit> unit;
+        unit = getUnit(unitSlot);
+        if (!unit.isPresent()) {
+            log.error("Unit value is absent.");
+            return createErrorResponse("I had problems understanding the unit.");
         }
+        log.info("Found unit " + unit);
 
         int price;
         try {
@@ -120,19 +119,18 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         }
 
         Slot productSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.PRODUCT.name());
-        Product product;
-        try {
-            product = Product.from(productSlot.getValue());
-            log.info("Found product: " + product);
-        } catch (DealBookerException exception) {
-            log.error(exception.getMessage());
-            return createErrorResponse(exception.getMessage());
+        Optional<Product> product;
+        product = getProduct(productSlot);
+        if (!product.isPresent()) {
+            log.error("Product information is missing");
+            return createErrorResponse("I had problems figuring out the product.");
         }
+        log.info("Found product: " + product);
 
         //TODO: Lokalisieren
-        String speechText = dealType.name() + " " + quantity + " " + unit.name() + " " + product.getText();
+        String speechText = dealType.name() + " " + quantity + " " + unit.get().name() + " " + product.get().name();
 
-        Mailer.sendMail(dealType, quantity, unit, product, price);
+        Mailer.sendMail(dealType, quantity, unit.get(), product.get(), price);
 
         SimpleCard card = getSimpleCard(CARD_TITLE, speechText);
 
@@ -146,7 +144,11 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         Slot priceSlot = intent.getSlot(de.freitag.stefan.alexa.dealbooker.Slot.PRICE.name());
         String value = priceSlot.getValue();
         if (value != null) {
-            return Integer.valueOf(priceSlot.getValue());
+            try {
+                return Integer.valueOf(priceSlot.getValue());
+            } catch (NumberFormatException exception) {
+                throw new DealBookerException("Could not parse price information.");
+            }
         } else {
             throw new DealBookerException("Information on price is missing.");
         }
@@ -167,9 +169,14 @@ public class DealBookerSpeechlet implements SpeechletV2 {
         return DealType.from(value);
     }
 
-    private Unit getUnit(final Slot unitSlot) throws DealBookerException {
+    private Optional<Unit> getUnit(final Slot unitSlot) {
         String value = getIdFromResolution(unitSlot);
-        return Unit.from(value);
+        return Unit.from(value.toUpperCase());
+    }
+
+    private Optional<Product> getProduct(final Slot productSlot) {
+        String value = getIdFromResolution(productSlot);
+        return Product.from(value.toUpperCase());
     }
 
     private String getIdFromResolution(final Slot slot) {

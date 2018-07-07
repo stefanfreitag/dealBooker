@@ -1,17 +1,23 @@
 package de.freitag.stefan.alexa.dealbooker;
 
+import com.google.common.base.Enums;
+
+import java.util.Objects;
+import java.util.Optional;
+
+
 enum Unit {
+    @SuppressWarnings("unused")
     GIGAWATT,
+    @SuppressWarnings("unused")
     MEGAWATT,
+    @SuppressWarnings("unused")
     KILOWATT,
+    @SuppressWarnings("unused")
     WATT;
 
-    static Unit from(final String text) throws DealBookerException {
-        for (Unit unit : Unit.values()) {
-            if (unit.name().equalsIgnoreCase(text)) {
-                return unit;
-            }
-        }
-        throw new DealBookerException("No unit with name " + text + " found.");
+    static Optional<Unit> from(final String text) {
+        Objects.requireNonNull(text);
+        return Enums.getIfPresent(Unit.class, text).toJavaUtil();
     }
 }

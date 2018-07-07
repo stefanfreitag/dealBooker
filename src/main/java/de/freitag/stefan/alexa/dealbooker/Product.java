@@ -1,27 +1,24 @@
 package de.freitag.stefan.alexa.dealbooker;
 
+import com.google.common.base.Enums;
+
+import java.util.Objects;
+import java.util.Optional;
+
 enum Product {
-    BOM("bom"),
-    ROM("rom"),
-    DAYAHEAD("day ahead"),
-    WITHINDAY("within day"),
-    WEEKEND("weekend");
-    private String text;
+    @SuppressWarnings("unused")
+    BOM,
+    @SuppressWarnings("unused")
+    ROM,
+    @SuppressWarnings("unused")
+    DAYAHEAD,
+    @SuppressWarnings("unused")
+    WITHINDAY,
+    @SuppressWarnings("unused")
+    WEEKEND;
 
-    Product(final String text) {
-        this.text = text;
-    }
-
-    String getText() {
-        return this.text;
-    }
-
-    static Product from(final String text) throws  DealBookerException{
-        for (Product product : Product.values()) {
-            if (product.text.equalsIgnoreCase(text)) {
-                return product;
-            }
-        }
-        throw new DealBookerException(text + "is not a valid product");
+    static Optional<Product> from(final String text) {
+        Objects.requireNonNull(text);
+        return Enums.getIfPresent(Product.class, text).toJavaUtil();
     }
 }

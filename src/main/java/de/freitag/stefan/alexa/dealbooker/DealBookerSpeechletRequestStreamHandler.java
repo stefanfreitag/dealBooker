@@ -1,19 +1,26 @@
 package de.freitag.stefan.alexa.dealbooker;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import com.amazon.speech.speechlet.lambda.SpeechletRequestStreamHandler;
+import com.amazon.ask.Skill;
+import com.amazon.ask.SkillStreamHandler;
+import com.amazon.ask.Skills;
 
 @SuppressWarnings("unused")
-public final class DealBookerSpeechletRequestStreamHandler extends SpeechletRequestStreamHandler {
-    private static final Set<String> supportedApplicationIds;
-    static {
-        supportedApplicationIds = new HashSet<>();
-        supportedApplicationIds.add("amzn1.ask.skill.aeb31ea6-f0af-49a1-8e4c-9183d077064a");
-    }
+public final class DealBookerSpeechletRequestStreamHandler extends SkillStreamHandler {
 
-    public DealBookerSpeechletRequestStreamHandler() {
-        super(new DealBookerSpeechlet(), supportedApplicationIds);
-    }
+  private static Skill getSkill() {
+    return Skills.standard()
+        .addRequestHandlers(
+            new LaunchRequestHandler(),
+            new HelpIntentHandler(),
+            new CancelIntentHandler(),
+            new StopIntentHandler(),
+            new SessionEndedRequestHandler())
+        .addExceptionHandler(new GenericExceptionHandler())
+        .withSkillId("amzn1.ask.skill.aeb31ea6-f0af-49a1-8e4c-9183d077064a")
+        .build();
+  }
+
+  public DealBookerSpeechletRequestStreamHandler() {
+    super(getSkill());
+  }
 }

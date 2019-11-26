@@ -1,7 +1,12 @@
 plugins {
-    id "net.ltgt.errorprone" version "0.0.14"
+    //id "net.ltgt.errorprone" version "1.1.1"
     id "java"
     id "idea"
+    id "org.owasp.dependencycheck" version "5.2.4"
+    id 'io.franzbecker.gradle-lombok' version '3.2.0'
+    id "com.diffplug.gradle.spotless" version "3.26.0"
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+
 }
 
 group = "de.freitag.stefan.alexa"
@@ -24,23 +29,23 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    junitVersion = '5.4.0'
+}
 
 dependencies {
-    compile('com.amazon.alexa:alexa-skills-kit:1.8.1',
+    //errorprone("com.google.errorprone:error_prone_core:2.0.4")
+    implementation('com.amazon.alexa:ask-sdk:2.26.0',
             'com.amazonaws:aws-lambda-java-core:1.2.0',
             'com.amazonaws:aws-java-sdk-ses:1.11.354',
             'com.amazonaws:aws-lambda-java-log4j:1.0.0',
             'log4j:log4j:1.2.17',
-            'org.apache.commons:commons-lang3:3.3.2',
-            'org.apache.directory.studio:org.apache.commons.io:2.4',
-            'org.eclipse.jetty:jetty-server:9.0.6.v20130930',
-            'org.eclipse.jetty:jetty-servlet:9.0.6.v20130930',
             'org.slf4j:slf4j-api:1.7.10',
-            'com.google.guava:guava:23.5-jre'
+            'com.google.guava:guava:28.1-jre'
     )
-    testCompile('org.junit.jupiter:junit-jupiter-api:5.2.0')
-    testCompile('org.junit.jupiter:junit-jupiter-params:5.2.0')
-    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.2.0')
+    testImplementation('org.junit.jupiter:junit-jupiter-api:' + junitVersion,
+            'org.junit.jupiter:junit-jupiter-params:' + junitVersion)
+    testRuntime('org.junit.jupiter:junit-jupiter-engine:' +  junitVersion)
 
 }
 
@@ -51,11 +56,17 @@ test {
     }
 }
 
-
-task fatJar(type: Jar) {
-    baseName = project.name + '-fat'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+tasks.withType(JavaCompile).configureEach {
+         options.compilerArgs << "-Xlint:all"
 }
 
-build.dependsOn fatJar
+lombok {
+    version = "1.18.10"
+    sha256 = "2836e954823bfcbad45e78c18896e3d01058e6f643749810c608b7005ee7b2fa"
+}
+
+spotless {
+    java {
+        googleJavaFormat('1.7')
+    }
+}

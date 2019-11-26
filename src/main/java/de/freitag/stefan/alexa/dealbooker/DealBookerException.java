@@ -1,8 +1,12 @@
 package de.freitag.stefan.alexa.dealbooker;
 
-class DealBookerException extends  Exception{
+import java.io.Serializable;
 
-    DealBookerException(final String message) {
-        super(message);
-    }
+class DealBookerException extends Exception implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  DealBookerException(final String message) {
+    super(message);
+  }
 }

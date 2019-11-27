@@ -6,25 +6,25 @@ import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.model.Response;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import lombok.extern.log4j.Log4j2;
+import lombok.NonNull;
 
-@Log4j2
 public class HelpIntentHandler implements com.amazon.ask.dispatcher.request.handler.RequestHandler {
 
   private ResourceBundle bundle = ResourceBundle.getBundle("HelpIntentHandler");
 
   @Override
-  public boolean canHandle(HandlerInput input) {
+  public boolean canHandle(@NonNull final HandlerInput input) {
     return input.matches(intentName("AMAZON.HelpIntent"));
   }
 
   @Override
-  public Optional<Response> handle(HandlerInput input) {
-    String help = bundle.getString("HELP");
+  public Optional<Response> handle(@NonNull final HandlerInput input) {
+    final String text = bundle.getString("HELP");
     return input
         .getResponseBuilder()
-        .withSpeech(help)
-        .withSimpleCard(DealBookerUtils.CARD_TITLE, help)
+        .withSpeech(text)
+        .withSimpleCard(DealBookerUtils.getCardTitle(), text)
+        .withShouldEndSession(Boolean.FALSE)
         .build();
   }
 }

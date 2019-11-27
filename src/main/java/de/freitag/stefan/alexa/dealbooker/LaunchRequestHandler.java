@@ -8,18 +8,21 @@ import com.amazon.ask.model.Session;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class LaunchRequestHandler
     implements com.amazon.ask.dispatcher.request.handler.impl.LaunchRequestHandler {
   @Override
-  public boolean canHandle(HandlerInput input, LaunchRequest launchRequest) {
+  public boolean canHandle(
+      @NonNull final HandlerInput input, @NonNull final LaunchRequest launchRequest) {
     return true;
   }
 
   @Override
-  public Optional<Response> handle(HandlerInput input, LaunchRequest launchRequest) {
+  public Optional<Response> handle(
+      @NonNull final HandlerInput input, @NonNull final LaunchRequest launchRequest) {
     Request request = input.getRequestEnvelope().getRequest();
     Session session = input.getRequestEnvelope().getSession();
     log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
@@ -33,7 +36,8 @@ public class LaunchRequestHandler
     return input
         .getResponseBuilder()
         .withSpeech(text)
-        .withSimpleCard(DealBookerUtils.CARD_TITLE, text)
+        .withSimpleCard(DealBookerUtils.getCardTitle(), text)
+        .withShouldEndSession(Boolean.FALSE)
         .build();
   }
 }

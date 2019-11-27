@@ -4,5 +4,8 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 class DealBookerUtils {
-  String CARD_TITLE = "Deal Booker";
+
+  String getCardTitle() {
+    return "Deal Booker";
+  }
 }

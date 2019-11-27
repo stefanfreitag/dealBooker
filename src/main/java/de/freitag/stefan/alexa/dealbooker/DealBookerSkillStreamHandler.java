@@ -5,7 +5,7 @@ import com.amazon.ask.SkillStreamHandler;
 import com.amazon.ask.Skills;
 
 @SuppressWarnings("unused")
-public final class DealBookerSpeechletRequestStreamHandler extends SkillStreamHandler {
+public final class DealBookerSkillStreamHandler extends SkillStreamHandler {
 
   private static Skill getSkill() {
     return Skills.standard()
@@ -14,13 +14,14 @@ public final class DealBookerSpeechletRequestStreamHandler extends SkillStreamHa
             new HelpIntentHandler(),
             new CancelIntentHandler(),
             new StopIntentHandler(),
+            new DealIntentHandler(),
             new SessionEndedRequestHandler())
         .addExceptionHandler(new GenericExceptionHandler())
         .withSkillId("amzn1.ask.skill.aeb31ea6-f0af-49a1-8e4c-9183d077064a")
         .build();
   }
 
-  public DealBookerSpeechletRequestStreamHandler() {
+  public DealBookerSkillStreamHandler() {
     super(getSkill());
   }
 }

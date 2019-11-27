@@ -1,8 +1,8 @@
 package de.freitag.stefan.alexa.dealbooker;
 
 import com.google.common.base.Enums;
-import java.util.Objects;
 import java.util.Optional;
+import lombok.NonNull;
 
 enum Unit {
   @SuppressWarnings("unused")
@@ -14,8 +14,7 @@ enum Unit {
   @SuppressWarnings("unused")
   WATT;
 
-  static Optional<Unit> from(final String text) {
-    Objects.requireNonNull(text);
+  static Optional<Unit> from(@NonNull final String text) {
     return Enums.getIfPresent(Unit.class, text).toJavaUtil();
   }
 }
